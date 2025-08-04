@@ -1,0 +1,83 @@
+/* App.css or index.css */
+body {
+  background-color: #F7E7CE;
+  margin: 0;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+
+/* Default (Desktop) */
+.pos-top-left {
+  top: 0;
+  left: 0;
+}
+
+.pos-top-right {
+  top: 0;
+  right: 0;
+}
+
+.pos-bottom-left {
+  bottom: 0;
+  left: 0;
+}
+
+.pos-bottom-right {
+  bottom: 0;
+  right: 0;
+}
+
+.pos-top {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pos-bottom {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pos-left {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.pos-right {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.pos-center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Mobile (<=600px) — reset transforms for better layout inside phone frame */
+@media screen and (max-width: 600px) {
+
+  .pos-top-left,
+  .pos-top-right,
+  .pos-bottom-left,
+  .pos-bottom-right,
+  .pos-top,
+  .pos-bottom,
+  .pos-left,
+  .pos-right,
+  .pos-center {
+    top: 0 !important;
+    left: 0 !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+}
+
