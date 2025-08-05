@@ -2,7 +2,6 @@ import { useEditor } from "@craftjs/core";
 import { Typography, Box, Button as MUIButton } from '@mui/material';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import { toPng, toJpeg, toSvg } from 'html-to-image';
-import { renderToStaticMarkup } from 'react-dom/server';
 
 function SaveOptions({ canvasRef }) {
     const { query } = useEditor();
@@ -54,10 +53,31 @@ function SaveOptions({ canvasRef }) {
         }
     }
 
-
-    const downloadAsHTML = () => {
+    const downloadAsHTML = async () => {
+        // Inline styles
         inlineAllStyles(canvasRef.current);
+
+        //Convert all blob/image URLs to base64
+        const imgElements = canvasRef.current.querySelectorAll("img");
+        for (let img of imgElements) {
+            const src = img.getAttribute("src");
+            if (src && src.startsWith("blob:")) {
+                const blob = await fetch(src).then(res => res.blob());
+                const reader = new FileReader();
+                await new Promise(resolve => {
+                    reader.onloadend = () => {
+                        img.setAttribute("src", reader.result); // set base64
+                        resolve();
+                    };
+                    reader.readAsDataURL(blob);
+                });
+            }
+        }
+
+        // Get outer HTML
         const htmlContent = canvasRef.current.outerHTML;
+
+        //get the google fonts used in the project
         const fonts = [
             "Roboto",
             "Open Sans",
@@ -114,6 +134,7 @@ function SaveOptions({ canvasRef }) {
             "Playwrite Magyarország",
             "Playfair Display"
         ];
+        // Load font links
         const fontLinks = fonts.map(
             font => `<link href="https://fonts.googleapis.com/css2?family=${font.replace(/ /g, '+')}&display=swap" rel="stylesheet">`
         ).join("\n");
@@ -143,6 +164,7 @@ function SaveOptions({ canvasRef }) {
       </html>
     `;
 
+        // Create blob and trigger download
         const blob = new Blob([fullHTML], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
