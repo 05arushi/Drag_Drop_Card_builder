@@ -15,16 +15,15 @@ import Divider from './Component/Divider/Divider';
 import Video from './Component/Video/Video';
 import AudioComponent from './Component/AudioComponent/AudioComponent';
 import ListComponent from './Component/ListComponent/ListComponent';
-import { Editor, Frame, Element } from "@craftjs/core";
+import { Editor, Frame, Element} from "@craftjs/core";
 import { makeStyles } from '@mui/styles';
 import { IconButton, Popover } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import PersonalVideoIcon from '@mui/icons-material/PersonalVideo';
 import SaveIcon from '@mui/icons-material/Save';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
-import { toPng, toJpeg, toSvg } from 'html-to-image';
 import 'pattern.css';
+import SaveOptions from './Component/SaveOptions';
 
 const useStyles = makeStyles({
   root: {
@@ -88,40 +87,6 @@ function App() {
     setIsMobileView(prev => !prev);
   };
 
-  const saveAsPNG = async () => {
-    if (!canvasRef.current) return;
-    const dataUrl = await toPng(canvasRef.current, {
-      skipFonts: true
-    });
-    const link = document.createElement('a');
-    link.download = 'export.png';
-    link.href = dataUrl;
-    link.click();
-    handleCloseSavePopover();
-  };
-
-  const saveAsJPG = async () => {
-    if (canvasRef.current === null) return;
-    try {
-      const dataUrl = await toJpeg(canvasRef.current, { quality: 0.95 });
-      const link = document.createElement('a');
-      link.download = 'my-custom-card.jpg';
-      link.href = dataUrl;
-      link.click();
-    } catch (error) {
-      console.error('Failed to save image', error);
-    }
-  };
-
-  const saveAsSVG = async () => {
-    if (!canvasRef.current) return;
-    const dataUrl = await toSvg(canvasRef.current);
-    const link = document.createElement('a');
-    link.download = 'export.svg';
-    link.href = dataUrl;
-    link.click();
-    handleCloseSavePopover();
-  };
 
   return (
     <Box
@@ -238,20 +203,7 @@ function App() {
                   }
                 }}
               >
-                <Box display="flex" flexDirection="column" gap={1} p={1}>
-                  <MUIButton variant="text" onClick={saveAsPNG} sx={{ color: 'white', justifyContent: 'flex-start' }}
-                    startIcon={<SaveAltIcon />}>
-                    PNG
-                  </MUIButton>
-                  <MUIButton variant="text" onClick={saveAsJPG} sx={{ color: 'white', justifyContent: 'flex-start' }}
-                    startIcon={<SaveAltIcon />}>
-                    JPG
-                  </MUIButton>
-                  <MUIButton variant="text" onClick={saveAsSVG} sx={{ color: 'white', justifyContent: 'flex-start' }}
-                    startIcon={<SaveAltIcon />}>
-                    SVG
-                  </MUIButton>
-                </Box>
+               <SaveOptions canvasRef={canvasRef} />
               </Popover>
 
               {open && (
