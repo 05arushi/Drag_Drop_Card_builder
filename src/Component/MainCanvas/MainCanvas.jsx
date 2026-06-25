@@ -1,17 +1,18 @@
 import { Element } from "@craftjs/core";
 import { Paper, Box, useMediaQuery } from "@mui/material";
 import { useNode, useEditor } from "@craftjs/core";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import MainCanvasSettings from "./MainCanvasSettings";
+import { MobileViewContext } from "../../App";
 import 'pattern.css';
 
 function MainCanvas({ children,
     boxPosition = "center",
     boxStyle = "box",
     patternName = "",
-    background = "#ffffff",
-    isMobileView = false }) {
+    background = "#ffffff" }) {
 
+    const isMobileView = useContext(MobileViewContext);
     const [onHover, setOnHover] = useState(false);
 
     const {
@@ -39,10 +40,11 @@ function MainCanvas({ children,
 
     const getBoxSizeStyles = (style) => {
         if (isMobileView) {
-            // On mobile, all styles should be full width
+            // On mobile, fill the phone frame fully
             return {
                 width: '100%',
-                minHeight: style === 'tallbox' ? '400px' : style === 'widebox' ? '200px' : '250px',
+                height: '100%',
+                minHeight: '100%',
             };
         } else {
             // Desktop styles
@@ -72,22 +74,26 @@ function MainCanvas({ children,
     return (
         <Box
             position="relative"
-            height="95vh"
+            sx={{
+                width: '100%',
+                height: isMobileView ? '100%' : '95vh',
+                minHeight: isMobileView ? '100%' : '95vh',
+            }}
         >
             <div
                 ref={ref => connect(drag(ref))}
                 onMouseEnter={() => setOnHover(true)}
                 onMouseLeave={() => setOnHover(false)}
                 elevation={0}
-                className={`${patternName || ''} ${getPositionClass(boxPosition)}`}
+                className={isMobileView ? (patternName || '') : `${patternName || ''} ${getPositionClass(boxPosition)}`}
                 style={{
-                    position: 'absolute',
+                    position: isMobileView ? 'relative' : 'absolute',
                     backgroundColor: background,
-                    // ...getPositionStyles(boxPosition),
                     ...getBoxSizeStyles(boxStyle),
                     padding: "10px",
                     boxSizing: 'border-box',
                     border: onHover ? "5px solid #4ca1fa" : "none",
+                    overflow: isMobileView ? 'hidden' : 'visible',
                 }}
             >
                 {children}

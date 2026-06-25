@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Grid,
@@ -14,9 +14,6 @@ import DesignServicesIcon from '@mui/icons-material/DesignServices';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 
 export const SettingsPanel = () => {
-  const drawerTimeout = useRef(null);
-  const isDraggingIntent = useRef(false);
-
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("text");
 
@@ -39,44 +36,15 @@ export const SettingsPanel = () => {
   });
 
   useEffect(() => {
-    const handleMouseDown = () => {
-      isDraggingIntent.current = false;
-      drawerTimeout.current = setTimeout(() => {
-        isDraggingIntent.current = true;
-      }, 150);
-    };
+    if (dragged && dragged.size > 0) return;
 
-    const handleMouseUp = () => {
-      clearTimeout(drawerTimeout.current);
-    };
-
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
-      clearTimeout(drawerTimeout.current);
-    };
-  }, []);
-
-
-  useEffect(() => {
-    clearTimeout(drawerTimeout.current);
-
-    if (dragged.size > 0) return;
-
-    drawerTimeout.current = setTimeout(() => {
-      if (isDraggingIntent.current) return;
-
-      if (selected?.name === "Container" && selected?.props?.onclick) {
-        setOpen(true);
-      } else if (selected && selected?.name !== "InsideContainer") {
-        setOpen(true);
-      } else {
-        setOpen(false);
-      }
-    }, 200);
+    if (selected?.name === "Container" && selected?.props?.onclick) {
+      setOpen(true);
+    } else if (selected && selected?.name !== "InsideContainer") {
+      setOpen(true);
+    } else {
+      setOpen(false);
+    }
   }, [selected, dragged]);
 
 
