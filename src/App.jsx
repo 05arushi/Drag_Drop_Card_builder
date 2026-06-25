@@ -34,19 +34,17 @@ const useStyles = makeStyles({
   },
   canvasArea: {
     padding: '20px',
-    borderRight: '1px solid #ddd',
     marginTop: '5px',
     marginBottom: '5px',
-    overflowX: 'hidden',
-    overflowY: 'auto',
+    overflow: 'hidden',
 
-    // Mobile responsiveness
     '@media screen and (max-width: 600px)': {
       padding: '10px',
-      borderRight: 'none',
     }
   },
 });
+
+export const MobileViewContext = React.createContext(false);
 
 function App() {
 
@@ -96,137 +94,169 @@ function App() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        position: 'relative',
         bgcolor: isMobileView ? '#0f172a' : '#f7e7ce',
       }}
     >
-      <Box
-        sx={{
-          width: isMobileView ? 375 : '100%',
-          height: isMobileView ? 667 : '100vh',
-          maxHeight: '100vh',
-          border: isMobileView ? '12px solid #444' : 'none',
-          borderRadius: isMobileView ? '24px' : 0,
-          boxShadow: isMobileView ? 5 : 0,
-          bgcolor: isMobileView ? '#1e293b' : '#f7e7ce',
-          position: 'relative',
+      <MobileViewContext.Provider value={isMobileView}>
+      <Editor
+        resolver={{
+          MainCanvas,
+          Card,
+          Button,
+          Text,
+          Container,
+          InsideContainer,
+          ImageUpload,
+          Table,
+          GalleryComponent,
+          Divider,
+          Video,
+          AudioComponent,
+          ListComponent
         }}
       >
-        <Editor
-          resolver={{
-            MainCanvas,
-            Card,
-            Button,
-            Text,
-            Container,
-            InsideContainer,
-            ImageUpload,
-            Table,
-            GalleryComponent,
-            Divider,
-            Video,
-            AudioComponent,
-            ListComponent
+        <Box
+          sx={{
+            width: isMobileView ? 375 : '100%',
+            height: isMobileView ? 'min(667px, calc(100vh - 32px))' : '100vh',
+            maxHeight: '100vh',
+            border: isMobileView ? '12px solid #444' : 'none',
+            borderRadius: isMobileView ? '24px' : 0,
+            boxShadow: isMobileView ? 5 : 0,
+            bgcolor: isMobileView ? '#1e293b' : '#f7e7ce',
+            position: 'relative',
+            overflow: 'hidden',
+            mt: isMobileView ? 2 : 0,
+            boxSizing: 'border-box',
           }}
         >
-          <Grid container spacing={2} wrap="nowrap">
+          <Grid
+            container
+            spacing={2}
+            wrap="nowrap"
+            sx={{
+              width: '100%',
+              m: 0,
+              height: isMobileView ? '100%' : 'auto',
+            }}
+          >
             {/* Main Canvas Area */}
-            <Grid size={12} className={classes.canvasArea}>
-              <Box ref={canvasRef} >
+            <Grid
+              size={12}
+              className={classes.canvasArea}
+              sx={{
+                width: '100%',
+                maxWidth: '100%',
+                overflowX: 'hidden',
+                height: isMobileView ? '100%' : 'auto',
+              }}
+            >
+              <Box
+                ref={canvasRef}
+                sx={{
+                  width: '100%',
+                  maxWidth: '100%',
+                  overflowX: 'hidden',
+                  height: isMobileView ? '100%' : 'auto',
+                }}
+              >
                 <Frame>
-                  <Element is={MainCanvas} isMobileView={isMobileView} canvas>
+                  <Element is={MainCanvas} canvas>
                     {/* this is the dropable zone */}
                   </Element>
                 </Frame>
               </Box>
             </Grid>
-
-            <SettingsPanel />
-
-            <Box
-              position="absolute"
-              top={20}
-              right={20}
-              zIndex={1000}
-              display="flex"
-              alignItems="center"
-              gap={1}
-              bgcolor="#111827"
-              borderRadius={2}
-              px={2}
-              py={1}
-              boxShadow={4}
-            >
-              <IconButton
-                onClick={(e) => setAnchorEl((prev) => !prev)}
-                sx={{ color: '#ffffff' }}
-              >
-                <AddCircleIcon fontSize="medium" />
-              </IconButton>
-
-              <IconButton
-                onClick={handleToggleView}
-                sx={{ color: '#ffffff' }}
-              >
-                {isMobileView ? (
-                  <PhoneAndroidIcon fontSize="medium" />
-                ) : (
-                  <PersonalVideoIcon fontSize="medium" />
-                )}
-              </IconButton>
-
-              <IconButton
-                onClick={handleSaveClick}
-                sx={{ color: '#ffffff' }}
-              >
-                <SaveIcon fontSize="medium" />
-              </IconButton>
-
-              <Popover
-                open={openSavePopover}
-                anchorEl={saveAnchorEl}
-                onClose={handleCloseSavePopover}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-                PaperProps={{
-                  sx: {
-                    backgroundColor: '#1f1f2e',
-                    color: '#fff',
-                    mt: 1,
-                    p: 1,
-                    borderRadius: 2,
-                  }
-                }}
-              >
-               <SaveOptions canvasRef={canvasRef} />
-              </Popover>
-
-              {open && (
-                <Box
-                  ref={popoverRef}
-                  position="absolute"
-                  top={70}
-                  right={0}
-                  bgcolor="#fff"
-                  boxShadow={3}
-                  borderRadius={2}
-                  zIndex={1000}
-                  p={2}
-                  minWidth={300}
-                  sx={{ backgroundColor: '#1f1f2e' }}
-                >
-                  <Toolbox />
-                </Box>
-              )}
-            </Box>
           </Grid>
-        </Editor>
-      </Box>
+        </Box>
+
+        <SettingsPanel />
+
+        <Box
+          position="absolute"
+          top={20}
+          right={20}
+          zIndex={1000}
+          display="flex"
+          alignItems="center"
+          gap={1}
+          bgcolor="#111827"
+          borderRadius={2}
+          px={2}
+          py={1}
+          boxShadow={4}
+        >
+          <IconButton
+            onClick={(e) => setAnchorEl((prev) => !prev)}
+            sx={{ color: '#ffffff' }}
+          >
+            <AddCircleIcon fontSize="medium" />
+          </IconButton>
+
+          <IconButton
+            onClick={handleToggleView}
+            sx={{ color: '#ffffff' }}
+          >
+            {isMobileView ? (
+              <PhoneAndroidIcon fontSize="medium" />
+            ) : (
+              <PersonalVideoIcon fontSize="medium" />
+            )}
+          </IconButton>
+
+          <IconButton
+            onClick={handleSaveClick}
+            sx={{ color: '#ffffff' }}
+          >
+            <SaveIcon fontSize="medium" />
+          </IconButton>
+
+          <Popover
+            open={openSavePopover}
+            anchorEl={saveAnchorEl}
+            onClose={handleCloseSavePopover}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            PaperProps={{
+              sx: {
+                backgroundColor: '#1f1f2e',
+                color: '#fff',
+                mt: 1,
+                p: 1,
+                borderRadius: 2,
+              }
+            }}
+          >
+           <SaveOptions canvasRef={canvasRef} />
+          </Popover>
+
+          {open && (
+            <Box
+              ref={popoverRef}
+              position="absolute"
+              top={70}
+              right={0}
+              bgcolor="#fff"
+              boxShadow={3}
+              borderRadius={2}
+              zIndex={1000}
+              p={2}
+              minWidth={300}
+              sx={{ backgroundColor: '#1f1f2e' }}
+            >
+              <Toolbox />
+            </Box>
+          )}
+        </Box>
+      </Editor>
+      </MobileViewContext.Provider>
     </Box>
   );
 
